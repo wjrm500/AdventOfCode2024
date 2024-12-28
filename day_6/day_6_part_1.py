@@ -64,14 +64,4 @@ try:
             guard_position = new_guard_position
 except:
     print(len(positions_visited))
-    SHOW_MATRIX = 0
-    if SHOW_MATRIX:
-        for i in range(len(matrix)):
-            line = matrix[i]
-            for j in range(len(line)):
-                point = line[j]
-                if (i, j) in positions_visited:
-                    point = "X"
-                print(point, end="")
-            print("")
 # Answer: 4,982 - Correct
