@@ -1,9 +1,6 @@
 import itertools
-import math
 import os
 from collections import defaultdict
-
-import numpy as np
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,51 +8,61 @@ with open(f"{script_dir}/day_8_input.txt") as f:
     lines = f.readlines()
     lines = [line.rstrip("\n") for line in lines]
 
-class Locus:
-    def __init__(self, antenna, x, y):
-        self.antenna = antenna
+class Antinode:
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.antinode = False
+    
+    def __eq__(self, other: "Antinode"):
+        return (self.x, self.y) == (other.x, other.y)
+    
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+class Antenna:
+    def __init__(self, symbol, x, y):
+        self.symbol = symbol
+        self.x = x
+        self.y = y
     
     def __repr__(self):
         return f"({self.x}, {self.y})"
     
-    def antinode_positions(self, other: "Locus"):
+    def get_antinodes(self, other: "Antenna") -> tuple[Antinode, Antinode]:
         return (
-            (self.x - (other.x - self.x), self.y - (other.y - self.y)),
-            (other.x + (other.x - self.x), other.y + (other.y - self.y)),
+            Antinode(self.x - (other.x - self.x), self.y - (other.y - self.y)),
+            Antinode(other.x + (other.x - self.x), other.y + (other.y - self.y)),
         )
 
-loci: list[Locus] = []
+
+antenni: list[Antenna] = []
 x_lim = len(lines[0])
 y_lim = len(lines)
 for i in range(x_lim):
     line = lines[i]
     for j in range(y_lim):
-        antenna = line[j] if line[j] != "." else None
-        locus = Locus(antenna, x=j, y=i)
-        loci.append(locus)
-
-loci_by_antenna = defaultdict(list)
-for locus in loci:
-    if locus.antenna:
-        loci_by_antenna[locus.antenna].append(locus)
-
-loci_pairs: list[tuple[Locus]] = []
-for antenna, loci in loci_by_antenna.items():
-    loci_pairs.extend(itertools.combinations(loci, 2))
-
-all_antinode_positions = set()
-for locus_1, locus_2 in loci_pairs:
-    for antinode_position in locus_1.antinode_positions(locus_2):
-        antinode_x = antinode_position[0]
-        antinode_y = antinode_position[1]
-        if antinode_x < 0 or antinode_x >= x_lim:
+        if (symbol := line[j]) == ".":
             continue
-        if antinode_y < 0 or antinode_y >= y_lim:
+        antenna = Antenna(symbol, x=j, y=i)
+        antenni.append(antenna)
+
+antenni_by_symbol = defaultdict(list)
+for antenna in antenni:
+    if antenna.symbol:
+        antenni_by_symbol[antenna.symbol].append(antenna)
+
+antenna_pairs: list[tuple[Antenna]] = []
+for symbol, antenna in antenni_by_symbol.items():
+    antenna_pairs.extend(itertools.combinations(antenna, 2))
+
+all_antinodes = set()
+for antenna_1, antenna_2 in antenna_pairs:
+    for antinode in antenna_1.get_antinodes(antenna_2):
+        if antinode.x < 0 or antinode.x >= x_lim:
             continue
-        all_antinode_positions.add(antinode_position)
+        if antinode.y < 0 or antinode.y >= y_lim:
+            continue
+        all_antinodes.add(antinode)
     
-print(len(all_antinode_positions))
+print(len(all_antinodes))
 # Answer: 228 - Correct
