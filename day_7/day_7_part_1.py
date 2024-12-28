@@ -16,19 +16,21 @@ def get_possible_operator_sets(num_operators: int) -> list[list[str]]:
             possible_operator_sets.add(permutation)
     return [[y for y in x] for x in possible_operator_sets] # Listify
 
-def evaluate(operands: list[int], operator_set: list[str]) -> int:
+def evaluate(operands: list[int], operator_set: list[str], limit: int) -> int:
     cumulative_value = operands[0]
     for i in range(1, len(operands)):
         value = operands[i]
         operator = operator_set[i - 1]
         cumulative_value = eval(f"{cumulative_value}{operator}{value}")
+        if cumulative_value > limit:
+            return -1
     return cumulative_value
 
 def result_possible(expected_result: int, operands: list[int]) -> bool:
     num_operators = len(operands) - 1
     possible_operator_sets = get_possible_operator_sets(num_operators)
     for operator_set in possible_operator_sets:
-        evaluated_result = evaluate(operands, operator_set)
+        evaluated_result = evaluate(operands, operator_set, limit=expected_result)
         if evaluated_result == expected_result:
             return True
     return False
