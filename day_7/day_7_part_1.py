@@ -1,4 +1,3 @@
-import copy
 import functools
 import itertools
 import os
@@ -18,12 +17,10 @@ def get_possible_operator_sets(num_operators: int) -> list[list[str]]:
     return [[y for y in x] for x in possible_operator_sets] # Listify
 
 def evaluate(operands: list[int], operator_set: list[str]) -> int:
-    operands = copy.copy(operands)
-    operator_set = copy.copy(operator_set)
-    cumulative_value = operands.pop(0)
-    while operands:
-        value = operands.pop(0)
-        operator = operator_set.pop(0)
+    cumulative_value = operands[0]
+    for i in range(1, len(operands)):
+        value = operands[i]
+        operator = operator_set[i - 1]
         cumulative_value = eval(f"{cumulative_value}{operator}{value}")
     return cumulative_value
 
