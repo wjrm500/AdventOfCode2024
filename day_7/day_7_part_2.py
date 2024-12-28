@@ -10,7 +10,7 @@ with open(f"{script_dir}/day_7_input.txt") as f:
 @functools.cache
 def get_possible_operator_sets(num_operators: int) -> list[list[str]]:
     possible_operator_sets = set()
-    elements = ["+", "*"]
+    elements = ["+", "*", "||"]
     possible_operator_sets = itertools.product(elements, repeat=num_operators)
     return [[y for y in x] for x in possible_operator_sets] # Listify
 
@@ -19,7 +19,10 @@ def evaluate(operands: list[int], operator_set: list[str], limit: int) -> int:
     for i in range(1, len(operands)):
         value = operands[i]
         operator = operator_set[i - 1]
-        cumulative_value = eval(f"{cumulative_value}{operator}{value}")
+        if operator == "||":
+            cumulative_value = int("".join([str(cumulative_value), str(value)]))
+        else:
+            cumulative_value = eval(f"{cumulative_value}{operator}{value}")
         if cumulative_value > limit:
             return -1
     return cumulative_value
@@ -41,4 +44,4 @@ for line in lines:
     if result_possible(expected_result, operands):
         total += expected_result
 print(total)
-# Answer: 975,671,981,569 - Correct
+# Answer: 223,472,064,194,845 - Correct
