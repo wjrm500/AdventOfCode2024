@@ -11,6 +11,7 @@ def chunks(lst, n):
 
 class Block:
     arr: list[str]
+    index: int
 
 class File(Block):
     def __init__(self, n: int, id_number: int):
@@ -42,6 +43,8 @@ class Disk:
         return s
 
     def add_block(self, block: Block):
+        block_index = len(self.blocks)
+        block.index = block_index
         self.blocks.append(block)
         if isinstance(block, File):
             self.files.append(block)
@@ -68,6 +71,8 @@ class Disk:
     def attempt_move(self, file: File):
         file.move_attempted = True
         for free_space in self.free_spaces:
+            if free_space.index > file.index:
+                return
             if free_space.can_fit(file):
                 for _ in range(len(file.arr)):
                     self.transfer(file, free_space)
@@ -98,5 +103,4 @@ for i, chunk in enumerate(chunks(text, 2)):
 
 disk.compact()
 print(disk.checksum())
-print(disk)
-# Answer: 8,583,576,817,788 - Incorrect
+# Answer: 6,381,624,803,796 - Correct
